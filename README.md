@@ -1,6 +1,3 @@
-
----
-
 # Live API Data Integration: Real-Time Dashboards with Python & Power BI
 
 ## 📌 Project Overview
@@ -20,6 +17,68 @@ The dashboard provides **easy-to-understand visuals** (charts, graphs, trend lin
 2. **Process Data**: Clean and prepare data for analysis.  
 3. **Connect to Power BI**: Establish live connection for real-time updates.  
 4. **Visualize**: Build interactive dashboards with charts, graphs, and trend analysis.  
+
+---
+
+## 📊 Data ETL Process (API Data.ipynb)
+The ETL (Extract, Transform, Load) process is handled by the `API Data.ipynb` Jupyter notebook, which automates data fetching, processing, and preparation for analysis and visualization.
+
+### Key Steps in the ETL Pipeline:
+1. **Extract Countries Data**:
+   - Fetches a list of all countries from the World Bank API (`https://api.worldbank.org/countries?format=json&per_page=300`).
+   - Processes country metadata, including region, income level, and lending type.
+   - Cleans and renames columns for consistency (e.g., `iso2Code` to `country_id`).
+   - Filters out aggregates to focus on individual countries.
+
+2. **Extract Indicators Metadata**:
+   - Retrieves a comprehensive list of all available indicators from the World Bank API.
+   - Paginates through 525 pages to collect over 16,000 indicators.
+   - Saves the full indicator list to `final_df.csv` for reference.
+
+3. **Define Indicator Groups**:
+   - Organizes indicators into thematic categories for targeted analysis:
+     - **Economic Activity & Growth**: GDP growth, GDP per capita.
+     - **Labour Market Indicators**: Unemployment rates, labour force.
+     - **Trade & Globalization**: Exports, imports.
+     - **Poverty & Inequality**: Poverty headcount, Gini index.
+     - **Environmental Indicators**: Renewable energy, forest area.
+     - **Health Indicators**: Life expectancy, immunization rates, health expenditure, etc.
+     - **Technology Indicators**: Internet usage, mobile subscriptions.
+
+4. **Fetch Time-Series Data for Indicators**:
+   - For each indicator in the defined groups, fetches historical data from 2016 onwards (filtering `year > 2015`).
+   - Handles pagination to collect all available data points.
+   - Includes rate limiting (0.3s delay between requests) to respect API limits.
+   - Normalizes JSON responses into structured DataFrames.
+
+5. **Transform & Merge Data**:
+   - Merges each category's data with the countries DataFrame using `country_id`.
+   - Drops unnecessary columns (e.g., `indicator_id`, `name`, `id`) for cleaner datasets.
+   - Prepares data for analysis by ensuring consistent structure.
+
+6. **Load Data to CSVs**:
+   - Saves processed data for each category to separate CSV files:
+     - `economic.csv`
+     - `labour_market.csv`
+     - `trade.csv`
+     - `poverty.csv`
+     - `environment.csv`
+     - `health.csv`
+     - `technology.csv`
+
+7. **Exploratory Data Analysis (EDA)**:
+   - Performs correlation analysis on health indicators using a heatmap.
+   - Generates regression plots to explore relationships (e.g., health expenditure vs. life expectancy).
+   - Visualizes insights directly in the notebook for quick validation.
+
+### Technical Details:
+- **API Source**: World Bank Open Data API (https://data.worldbank.org/).
+- **Data Scope**: Global coverage for countries, with time-series data from 2016 to the latest available year.
+- **Libraries Used**: `requests` for API calls, `pandas` for data manipulation, `seaborn` and `matplotlib` for visualizations.
+- **Output**: Clean, category-specific CSV files ready for import into Power BI or other analysis tools.
+- **Automation**: The notebook can be run periodically to fetch the latest data, ensuring real-time updates.
+
+This ETL process ensures data integrity, handles API rate limits, and structures data optimally for downstream dashboard creation.
 
 ---
 
